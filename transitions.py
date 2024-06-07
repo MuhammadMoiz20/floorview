@@ -1,0 +1,26 @@
+async def get_current_stage(product_id):
+    conn = await asyncpg.connect('postgresql://user:pass@localhost/floorview')
+    stage = await conn.fetchrow('''
+        SELECT ps.*, s.name as stage_name 
+        FROM product_stages ps 
+        JOIN stages s ON ps.stage_id = s.id 
+        WHERE ps.product_id =  
+        ORDER BY ps.updated_at DESC LIMIT 1
+    ''', product_id)
+    await conn.close()
+    return stage
+async def transition_stage(product_id, from_stage, to_stage, notes=None, user='system'):
+    conn = await asyncpg.connect('postgresql://user:pass@localhost/floorview')
+    await conn.execute('''
+        UPDATE product_stages SET status = 'completed', updated_at = NOW()
+        WHERE product_id =  AND stage_id = 
+    ''', product_id, from_stage)
+    await conn.execute('''
+        INSERT INTO product_stages (product_id, stage_id, status, notes)
+        VALUES (, , 'in_progress', )
+    ''', product_id, to_stage, notes)
+    await conn.execute('''
+        INSERT INTO audit_log (product_id, from_stage, to_stage, changed_by)
+        VALUES (, , , )
+    ''', product_id, from_stage, to_stage, user)
+    await conn.close()
