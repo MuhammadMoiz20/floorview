@@ -24,3 +24,18 @@ async def transition_stage(product_id, from_stage, to_stage, notes=None, user='s
         VALUES (, , , )
     ''', product_id, from_stage, to_stage, user)
     await conn.close()
+async def get_all_stages():
+    conn = await asyncpg.connect('postgresql://user:pass@localhost/floorview')
+    stages = await conn.fetch('SELECT * FROM stages ORDER BY id')
+    await conn.close()
+    return stages
+async def get_products_by_stage(stage_id):
+    conn = await asyncpg.connect('postgresql://user:pass@localhost/floorview')
+    products = await conn.fetch('''
+        SELECT p.*, ps.status, ps.updated_at 
+        FROM products p 
+        JOIN product_stages ps ON p.id = ps.product_id 
+        WHERE ps.stage_id = 
+    ''', stage_id)
+    await conn.close()
+    return products
