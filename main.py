@@ -16,3 +16,11 @@ async def get_audit_log(product_id: int):
     logs = await conn.fetch('SELECT * FROM audit_log WHERE product_id = ', product_id)
     await conn.close()
     return logs
+@app.get('/stages')
+async def list_stages():
+    stages = await get_all_stages()
+    return stages
+@app.get('/stages/{stage_id}/products')
+async def products_in_stage(stage_id: int):
+    products = await get_products_by_stage(stage_id)
+    return products
