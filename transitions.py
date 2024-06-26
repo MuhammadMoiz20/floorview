@@ -39,3 +39,10 @@ async def get_products_by_stage(stage_id):
     ''', stage_id)
     await conn.close()
     return products
+async def get_dashboard_stats():
+    conn = await asyncpg.connect('postgresql://user:pass@localhost/floorview')
+    total_products = await conn.fetchval('SELECT COUNT(*) FROM products')
+    completed = await conn.fetchval("SELECT COUNT(*) FROM product_stages WHERE status = 'completed'")
+    in_progress = await conn.fetchval("SELECT COUNT(*) FROM product_stages WHERE status = 'in_progress'")
+    await conn.close()
+    return {'total': total_products, 'completed': completed, 'in_progress': in_progress}
