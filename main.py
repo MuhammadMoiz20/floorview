@@ -24,3 +24,7 @@ async def list_stages():
 async def products_in_stage(stage_id: int):
     products = await get_products_by_stage(stage_id)
     return products
+@app.get('/dashboard/stats')
+async def dashboard():
+    stats = await get_dashboard_stats()
+    return stats
