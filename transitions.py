@@ -46,3 +46,11 @@ async def get_dashboard_stats():
     in_progress = await conn.fetchval("SELECT COUNT(*) FROM product_stages WHERE status = 'in_progress'")
     await conn.close()
     return {'total': total_products, 'completed': completed, 'in_progress': in_progress}
+async def bulk_update_status(product_ids, status):
+    conn = await asyncpg.connect('postgresql://user:pass@localhost/floorview')
+    for pid in product_ids:
+        await conn.execute('''
+            UPDATE product_stages SET status = , updated_at = NOW()
+            WHERE product_id = 
+        ''', status, pid)
+    await conn.close()
