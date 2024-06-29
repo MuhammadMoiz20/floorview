@@ -28,3 +28,7 @@ async def products_in_stage(stage_id: int):
 async def dashboard():
     stats = await get_dashboard_stats()
     return stats
+@app.post('/products/bulk-update')
+async def bulk_update(product_ids: list, status: str):
+    await bulk_update_status(product_ids, status)
+    return {'message': f'Updated {len(product_ids)} products'}
